@@ -898,7 +898,23 @@ export default function SignupRealWorldScreen() {
 
             console.log("🔄 Response Status:", response.status);
 
-            const data = await response.json();
+            let responseText = "";
+            try {
+                responseText = await response.clone().text();
+            } catch (readError) {
+                console.warn("⚠️ Response body could not be read from clone:", readError);
+            }
+
+            let data: any = {};
+            if (responseText) {
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.warn("⚠️ Response was not JSON:", responseText);
+                    data = { message: responseText };
+                }
+            }
+
             console.log("✅ Response Data:", data);
 
             if (response.ok) {
@@ -909,7 +925,6 @@ export default function SignupRealWorldScreen() {
             } else {
                 setLoading(false);
                 setIsError(true);
-                // Handle Pydantic Validation Errors (Detail array)
                 const errorMessage = data.detail
                     ? (Array.isArray(data.detail) ? data.detail[0].msg : JSON.stringify(data.detail))
                     : (data.message || "Signup failed");
