@@ -815,6 +815,17 @@ const API_SIGNUP = `${BASE_URL}/auth/signup`;
 
 console.log("🚀 Signup API URL:", API_SIGNUP); // Debug log
 
+async function parseApiResponse(response: Response) {
+    const body = await response.text();
+
+    try {
+        return JSON.parse(body);
+    } catch {
+        console.error("Non-JSON signup response:", response.status, body);
+        throw new Error(`Server returned an invalid response (${response.status}): ${body.slice(0, 160)}`);
+    }
+}
+
 // ✅ THEME CONFIG
 const COLORS = {
     bgMain: "#050505",
@@ -898,7 +909,7 @@ export default function SignupRealWorldScreen() {
 
             console.log("🔄 Response Status:", response.status);
 
-            const data = await response.json();
+            const data = await parseApiResponse(response);
             console.log("✅ Response Data:", data);
 
             if (response.ok) {
@@ -909,7 +920,6 @@ export default function SignupRealWorldScreen() {
             } else {
                 setLoading(false);
                 setIsError(true);
-                // Handle Pydantic Validation Errors (Detail array)
                 const errorMessage = data.detail
                     ? (Array.isArray(data.detail) ? data.detail[0].msg : JSON.stringify(data.detail))
                     : (data.message || "Signup failed");
@@ -921,7 +931,7 @@ export default function SignupRealWorldScreen() {
             console.error("❌ Network Error:", error);
             setLoading(false);
             setIsError(true);
-            setModalMessage(`Connection Error: ${error.message}. Check IP or Server.`);
+            setModalMessage(error.message || "Could not connect to the server. Check the API URL and backend.");
             setShowSuccessModal(true);
         }
     };

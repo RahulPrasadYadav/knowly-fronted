@@ -419,6 +419,17 @@ const getBaseUrl = () => {
 const BASE_URL = getBaseUrl();
 const API_LOGIN = `${BASE_URL}/auth/login`;
 
+async function parseApiResponse(response: Response) {
+    const body = await response.text();
+
+    try {
+        return JSON.parse(body);
+    } catch {
+        console.error("Non-JSON login response:", response.status, body);
+        throw new Error(`Server returned an invalid response (${response.status}): ${body.slice(0, 160)}`);
+    }
+}
+
 const COLORS = {
     bgMain: "#050505",
     cardBg: "#0f0f0f",
@@ -466,7 +477,7 @@ export default function LoginRealWorldScreen() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
-            const data = await response.json();
+            const data = await parseApiResponse(response);
 
             if (response.ok) {
                 setLoading(false);
