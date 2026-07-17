@@ -920,7 +920,6 @@ export default function SignupRealWorldScreen() {
             } else {
                 setLoading(false);
                 setIsError(true);
-                // Handle Pydantic Validation Errors (Detail array)
                 const errorMessage = data.detail
                     ? (Array.isArray(data.detail) ? data.detail[0].msg : JSON.stringify(data.detail))
                     : (data.message || "Signup failed");
