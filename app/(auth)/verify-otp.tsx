@@ -41,6 +41,17 @@ const API_VERIFY = `${BASE_URL}/auth/verify-email`;
 
 console.log("🚀 Verify API URL:", API_VERIFY); // Debug log
 
+async function parseApiResponse(response: Response) {
+    const body = await response.text();
+
+    try {
+        return JSON.parse(body);
+    } catch {
+        console.error("Non-JSON verification response:", response.status, body);
+        throw new Error(`Server returned an invalid response (${response.status}): ${body.slice(0, 160)}`);
+    }
+}
+
 // ✅ THEME CONFIG
 const COLORS = {
     bg: "#00e096",      // Green Background
@@ -86,7 +97,7 @@ export default function VerifyOtpScreen() {
                 body: JSON.stringify(payload),
             });
 
-            const data = await response.json();
+            const data = await parseApiResponse(response);
 
             if (response.ok) {
                 setLoading(false);
@@ -100,11 +111,11 @@ export default function VerifyOtpScreen() {
                 setModalMessage(errorMessage);
                 setShowModal(true);
             }
-        } catch (error) {
+        } catch (error: any) {
             setLoading(false);
             setIsError(true);
             console.error("Verification Error:", error);
-            setModalMessage("Network Error: Could not connect to server.");
+            setModalMessage(error.message || "Could not connect to the server. Check the API URL and backend.");
             setShowModal(true);
         }
     };

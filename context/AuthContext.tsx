@@ -104,8 +104,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const storedToken = await AsyncStorage.getItem("token");
 
             if (storedUser && storedToken) {
-                setUser(JSON.parse(storedUser));
-                setToken(storedToken);
+                try {
+                    setUser(JSON.parse(storedUser));
+                    setToken(storedToken);
+                } catch {
+                    // A previous app version may have stored a token or plain
+                    // text in the `user` key. Clear that invalid session so it
+                    // cannot crash the app during startup.
+                    console.warn("Invalid saved session removed from storage.");
+                    await AsyncStorage.multiRemove(["user", "token"]);
+                    setUser(null);
+                    setToken(null);
+                }
             }
         } finally {
             setLoading(false);

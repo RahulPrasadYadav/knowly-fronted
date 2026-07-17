@@ -253,19 +253,7 @@ export default function TabLayout() {
         }}
       />
 
-      {/* ================= 4. ACTIVITY (New Slot to balance) ================= */}
-      {/* You can use 'notifications' or any other file here. Assuming 'notifications' exists or reuse 'explore' for now */}
-      <Tabs.Screen
-        name="notifications" // Ensure you have notifications.tsx or change this
-        options={{
-          title: "Activity",
-          tabBarIcon: ({ color }) => (
-            <Feather size={22} name="activity" color={color} />
-          ),
-        }}
-      />
-
-      {/* ================= 5. PROFILE ================= */}
+      {/* ================= 4. PROFILE ================= */}
       <Tabs.Screen
         name="profile"
         options={{
